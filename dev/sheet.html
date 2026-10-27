@@ -1,0 +1,49 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Art sheet</title>
+<link rel="stylesheet" href="../css/app.css">
+<style>
+body{background:#ffe9f3;padding:12px}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.cell{width:230px;background:#fff6fa;border-radius:16px;padding:4px;text-align:center;font-size:12px}
+.cell svg.pet{width:100%;height:auto}
+.th{display:flex;flex-wrap:wrap;gap:6px}
+.th div{width:90px;height:70px;background:#fff;border-radius:10px}
+.th svg{width:100%;height:100%}
+</style></head><body>
+<div id="out"></div>
+<script type="module">
+import {petSVG, defaultLook, itemThumb, hairThumb} from '../js/pet.js';
+import {SPECIES_ORDER, ITEMS, HAIR_STYLES} from '../js/data.js';
+const q=new URLSearchParams(location.search);
+const out=document.getElementById('out');
+const row=(label,cells)=>{out.insertAdjacentHTML('beforeend',`<h4>${label}</h4><div class="row">${cells.map(c=>`<div class="cell">${c}</div>`).join('')}</div>`)};
+const mode=q.get('mode')||'defaults';
+if(mode==='defaults'){
+  row('defaults',SPECIES_ORDER.map(s=>petSVG(defaultLook(s),{cls:'bob'})));
+}
+if(mode==='dressed'){
+  const looks=SPECIES_ORDER.map((s,i)=>{const l=defaultLook(s);
+    l.hairStyle=['pigtails','bangs','buns','long','puff'][i]; if(s!=='unicorn') l.hairColor=['#ff7fb7','#4a3a44','#c4a3ff','rainbow','#8fcaff'][i];
+    l.outfit={id:['tee','dress','tutu','overalls','hoodie'][i],c:ITEMS.outfit[i].def};
+    l.hat={id:['crown','bow','party','flowers','beret'][i],c:ITEMS.hat[i].def};
+    l.glasses={id:['round','heart','star','shades','round'][i],c:ITEMS.glasses[i%4].def};
+    l.neck={id:['bowtie','scarf','pearls','bell','lei'][i],c:ITEMS.neck[i].def};
+    l.nails=['#ff7fb7','#ff7fb7','#6aa9ff','#6aa9ff'];
+    return l});
+  row('dressed',looks.map(l=>petSVG(l)));
+}
+if(mode==='hair'){
+  row('hair',HAIR_STYLES.map(h=>{const l=defaultLook('bunny');l.hairStyle=h;l.hairColor='#c4a3ff';return petSVG(l)}));
+}
+if(mode==='items'){
+  for(const slot of Object.keys(ITEMS)) out.insertAdjacentHTML('beforeend',`<h4>${slot}</h4><div class="th">${ITEMS[slot].map(i=>`<div>${itemThumb(slot,i.id,i.def)}</div>`).join('')}</div>`);
+  out.insertAdjacentHTML('beforeend',`<h4>hair</h4><div class="th">${HAIR_STYLES.map(h=>`<div>${hairThumb(h,'#c4a3ff')}</div>`).join('')}</div>`);
+}
+if(mode==='patterns'){
+  row('patterns',['none','spots','stripes','hearts','stars','dots'].map(p=>{const l=defaultLook('puppy');l.fur='#ffb8d6';l.pattern=p;l.patColor='#8e6be0';return petSVG(l)}));
+}
+if(mode==='color'){
+  row('color',SPECIES_ORDER.map(s=>petSVG(defaultLook(s),{mode:'color',fills:{}})));
+}
+window.__done=true;
+</script></body></html>
