@@ -1,0 +1,10 @@
+# Render Blueprint: deploys the game as a static site (no build step).
+services:
+  - type: web
+    name: my-pet-makeover
+    runtime: static
+    staticPublishPath: .
+    headers:
+      - path: /sw.js
+        name: Cache-Control
+        value: no-cache
